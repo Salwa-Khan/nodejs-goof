@@ -155,16 +155,24 @@ function parse(todo) {
 }
 
 exports.create = function (req, res, next) {
-  // console.log('req.body: ' + JSON.stringify(req.body));
-
+  // --- FIX START: RESOURCE EXHAUSTION (CWE-770) ---
   var item = req.body.content;
+
+  // 1. Validation: Ensure item exists and is not dangerously long
+  // 5000 characters is plenty for a TODO, but safe for the server
+  if (typeof item !== 'string' || item.length > 5000) {
+    return res.status(400).send("Content is too long or invalid.");
+  }
+  // --- FIX END ---
+
   var imgRegex = /\!\[alt text\]\((http.*)\s\".*/;
-  if (typeof (item) == 'string' && item.match(imgRegex)) {
+  
+  // 2. Double check: Only run regex if item is a string (already validated above)
+  if (item.match(imgRegex)) {
     var url = item.match(imgRegex)[1];
     console.log('found img: ' + url);
 
     exec('identify ' + url, function (err, stdout, stderr) {
-      console.log(err);
       if (err !== null) {
         console.log('Error (' + err + '):' + stderr);
       }
@@ -180,15 +188,8 @@ exports.create = function (req, res, next) {
   }).save(function (err, todo, count) {
     if (err) return next(err);
 
-    /*
-    res.setHeader('Data', todo.content.toString('base64'));
-    res.redirect('/');
-    */
-
     res.setHeader('Location', '/');
     res.status(302).send(todo.content.toString('base64'));
-
-    // res.redirect('/#' + todo.content.toString('base64'));
   });
 };
 
