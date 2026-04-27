@@ -40,7 +40,7 @@ app.set('view engine', 'ejs');
 app.use(logger('dev'));
 app.use(methodOverride());
 app.use(session({
-  secret: 'keyboard cat',
+  secret: secret: process.env.SESSION_SECRET || 'fallback-secret-for-dev',
   name: 'connect.sid',
   cookie: { path: '/' }
 }))
