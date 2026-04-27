@@ -44,8 +44,9 @@ app.use(session({
   name: 'connect.sid',
   cookie: { path: '/' }
 }))
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+// Limit the size of the request body to 10kb
+app.use(bodyParser.json({ limit: '10kb' }));
+app.use(bodyParser.urlencoded({ limit: '10kb', extended: true }));
 app.use(fileUpload());
 
 // Routes
