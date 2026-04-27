@@ -47,7 +47,7 @@ app.use(session({
 // Limit the size of the request body to 10kb
 app.use(bodyParser.json({ limit: '10kb' }));
 app.use(bodyParser.urlencoded({ limit: '10kb', extended: true }));
-app.use(fileUpload());
+app.use(bodyParser.text({ limit: '10kb' }));
 
 // Routes
 app.use(routes.current_user);
